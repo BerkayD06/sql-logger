@@ -19,7 +19,8 @@ import javax.sql.DataSource;
 @ConditionalOnProperty(prefix = "querylogger", name = "enabled", havingValue = "true", matchIfMissing = true)
 @AutoConfigureAfter(name = {
     "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration",
-    "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration"
+    "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration",
+    "org.springframework.boot.actuate.autoconfigure.jdbc.DataSourceHealthIndicatorAutoConfiguration"
 })
 public class QueryLoggerAutoConfiguration {
 
@@ -30,7 +31,7 @@ public class QueryLoggerAutoConfiguration {
         return new BeanPostProcessor() {
             @Override
             public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-                if (bean instanceof DataSource && !(bean instanceof QueryLoggingDataSource)) {
+                if ("dataSource".equals(beanName) && bean instanceof DataSource && !(bean instanceof QueryLoggingDataSource)) {
                     return new QueryLoggingDataSource((DataSource) bean, props);
                 }
                 return bean;

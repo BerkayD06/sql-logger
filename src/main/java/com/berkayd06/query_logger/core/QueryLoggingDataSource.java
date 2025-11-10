@@ -143,15 +143,28 @@ public class QueryLoggingDataSource implements DataSource {
         if (iface.isInstance(target)) {
             return iface.cast(target);
         }
-        return target.unwrap(iface);
+        if (target instanceof javax.sql.DataSource) {
+            try {
+                return target.unwrap(iface);
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+        throw new SQLException("Cannot unwrap to " + iface.getName());
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        if (iface.isInstance(this) || iface.isInstance(target)) {
+        if (iface.isInstance(this)) {
             return true;
         }
-        return target.isWrapperFor(iface);
+        if (iface.isInstance(target)) {
+            return true;
+        }
+        if (target instanceof javax.sql.DataSource) {
+            return target.isWrapperFor(iface);
+        }
+        return false;
     }
 
     public DataSource getTargetDataSource() {
@@ -319,11 +332,11 @@ public class QueryLoggingDataSource implements DataSource {
 
             if (props.isLogParams() && props.getLogFormat() != QueryLoggerProperties.LogFormat.BOUND) {
                 String paramsStr = formatParams(params);
-                log.info("event=sql_query origin={} duration_ms={} canceled={} sql=\"{}\" params={}",
-                        origin, String.format(Locale.ROOT, "%.3f", durationMs), canceled, formattedSql, paramsStr);
+                System.out.println(String.format("INFO  %s - event=sql_query origin=%s duration_ms=%.3f canceled=%s sql=\"%s\" params=%s",
+                        props.getLoggerName(), origin, durationMs, canceled, formattedSql, paramsStr));
             } else {
-                log.info("event=sql_query origin={} duration_ms={} canceled={} sql=\"{}\"",
-                        origin, String.format(Locale.ROOT, "%.3f", durationMs), canceled, formattedSql);
+                System.out.println(String.format("INFO  %s - event=sql_query origin=%s duration_ms=%.3f canceled=%s sql=\"%s\"",
+                        props.getLoggerName(), origin, durationMs, canceled, formattedSql));
             }
         }
 
