@@ -109,6 +109,24 @@ public class QueryLoggingDataSource extends AbstractDataSource {
         return wrap(target.getConnection(username, password));
     }
 
+    @Override
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        if (iface.isInstance(this)) {
+            return iface.cast(this);
+        }
+        if (iface.isInstance(target)) {
+            return iface.cast(target);
+        }
+        return target.unwrap(iface);
+    }
+
+    @Override
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        if (iface.isInstance(this) || iface.isInstance(target)) {
+            return true;
+        }
+        return target.isWrapperFor(iface);
+    }
 
     private Connection wrap(final Connection connection) {
         return (Connection) Proxy.newProxyInstance(
