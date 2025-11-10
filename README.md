@@ -552,21 +552,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Changelog
 
-### Version 1.0.1
-- Removed comment lines from codebase
-- Improved code readability
-- Bug fixes and minor optimizations
-
-### Version 1.0.0
-- Initial release
-- SQL query logging and formatting
-- Query cancellation support
-- Hibernate/JPA integration
-- Multi-database support
-- Configurable thresholds and filtering
-
 ## Support
 
 For issues, questions, or feature requests, please visit the [GitHub Issues](https://github.com/berkayd06/query-logger/issues) page.
-
-## Related Projects
