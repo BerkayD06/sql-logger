@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 public class QueryLoggerProperties {
     private boolean enabled = true;
+    private boolean wrapDataSource = true;
 
     private long logThresholdMs = 200;
     private long cancelThresholdMs = 0;
@@ -90,6 +91,9 @@ public class QueryLoggerProperties {
 
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    public boolean isWrapDataSource() { return wrapDataSource; }
+    public void setWrapDataSource(boolean wrapDataSource) { this.wrapDataSource = wrapDataSource; }
 
     @Deprecated
     public long getThresholdMs() { return logThresholdMs; }
