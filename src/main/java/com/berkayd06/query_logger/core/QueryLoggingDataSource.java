@@ -6,15 +6,16 @@ import com.berkayd06.query_logger.util.SqlFormatter;
 import com.berkayd06.query_logger.vendor.VendorDialectHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.datasource.AbstractDataSource;
 
 import javax.sql.DataSource;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-public class QueryLoggingDataSource extends AbstractDataSource {
+public class QueryLoggingDataSource implements DataSource {
     
     private static final String[] EXECUTE_METHOD_PREFIXES = {
         "execute", "addBatch", "getResultSet", "executeQuery", 
@@ -110,6 +111,31 @@ public class QueryLoggingDataSource extends AbstractDataSource {
     }
 
     @Override
+    public PrintWriter getLogWriter() throws SQLException {
+        return target.getLogWriter();
+    }
+
+    @Override
+    public void setLogWriter(PrintWriter out) throws SQLException {
+        target.setLogWriter(out);
+    }
+
+    @Override
+    public void setLoginTimeout(int seconds) throws SQLException {
+        target.setLoginTimeout(seconds);
+    }
+
+    @Override
+    public int getLoginTimeout() throws SQLException {
+        return target.getLoginTimeout();
+    }
+
+    @Override
+    public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        return target.getParentLogger();
+    }
+
+    @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         if (iface.isInstance(this)) {
             return iface.cast(this);
@@ -126,6 +152,10 @@ public class QueryLoggingDataSource extends AbstractDataSource {
             return true;
         }
         return target.isWrapperFor(iface);
+    }
+
+    public DataSource getTargetDataSource() {
+        return target;
     }
 
     private Connection wrap(final Connection connection) {
