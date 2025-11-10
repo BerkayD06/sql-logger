@@ -1,7 +1,6 @@
 package com.berkayd06.query_logger.config;
 
 import com.berkayd06.query_logger.core.QueryLoggingDataSource;
-import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -17,11 +16,9 @@ import javax.sql.DataSource;
 public class QueryLoggerManualConfiguration {
 
     @Bean(name = "actualDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.hikari")
+    @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource actualDataSource() {
-        return DataSourceBuilder.create()
-            .type(HikariDataSource.class)
-            .build();
+        return DataSourceBuilder.create().build();
     }
     @Bean
     @Primary
