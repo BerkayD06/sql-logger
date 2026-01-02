@@ -49,11 +49,10 @@ public final class VendorDialectHelper {
     }
 
     public static String maybeAddVendorHints(String originalSql,
-                                             Connection connection,
+                                             DatabaseVendor vendor,
                                              QueryLoggerProperties props) {
-        if (originalSql == null) return null;
+        if (originalSql == null || vendor == null) return originalSql;
         String sql = originalSql;
-        DatabaseVendor vendor = detectVendor(connection);
 
         try {
             switch (vendor) {
@@ -84,10 +83,19 @@ public final class VendorDialectHelper {
 
         return sql;
     }
-    public static void maybeApplyVendorStatementTimeout(Connection connection, QueryLoggerProperties props) {
-        if (connection == null) return;
-        
+
+    @Deprecated
+    public static String maybeAddVendorHints(String originalSql,
+                                             Connection connection,
+                                             QueryLoggerProperties props) {
         DatabaseVendor vendor = detectVendor(connection);
+        return maybeAddVendorHints(originalSql, vendor, props);
+    }
+    public static void maybeApplyVendorStatementTimeout(Connection connection, 
+                                                        DatabaseVendor vendor, 
+                                                        QueryLoggerProperties props) {
+        if (connection == null || vendor == null || vendor == DatabaseVendor.UNKNOWN) return;
+        
         java.sql.Statement st = null;
         
         try {
@@ -139,6 +147,12 @@ public final class VendorDialectHelper {
                 } catch (Exception ignore) {}
             }
         }
+    }
+
+    @Deprecated
+    public static void maybeApplyVendorStatementTimeout(Connection connection, QueryLoggerProperties props) {
+        DatabaseVendor vendor = detectVendor(connection);
+        maybeApplyVendorStatementTimeout(connection, vendor, props);
     }
 
     @Deprecated

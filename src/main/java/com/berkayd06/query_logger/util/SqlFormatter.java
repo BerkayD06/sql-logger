@@ -49,16 +49,35 @@ public final class SqlFormatter {
             return trimmed;
         }
 
-        StringBuilder sb = new StringBuilder(trimmed.length() + 50);
-        Matcher keywordMatcher = SQL_KEYWORDS.matcher(trimmed);
-        int lastEnd = 0;
+        int len = trimmed.length();
+        StringBuilder sb = new StringBuilder(len + 50);
+        int pos = 0;
         
-        while (keywordMatcher.find()) {
-            sb.append(trimmed, lastEnd, keywordMatcher.start());
-            sb.append(keywordMatcher.group().toUpperCase());
-            lastEnd = keywordMatcher.end();
+        while (pos < len) {
+            char c = trimmed.charAt(pos);
+            
+            if (Character.isLetter(c)) {
+                int wordStart = pos;
+                int wordEnd = pos;
+                while (wordEnd < len && Character.isLetterOrDigit(trimmed.charAt(wordEnd))) {
+                    wordEnd++;
+                }
+                
+                String word = trimmed.substring(wordStart, wordEnd);
+                String upperWord = word.toUpperCase();
+                if (isKeyword(upperWord)) {
+                    sb.append(upperWord);
+                } else {
+                    sb.append(word);
+                }
+                
+                pos = wordEnd;
+            } else {
+                sb.append(c);
+                pos++;
+            }
         }
-        sb.append(trimmed, lastEnd, trimmed.length());
+        
         String formatted = sb.toString();
 
         formatted = MULTI_WHITESPACE.matcher(formatted).replaceAll(" ");
@@ -84,6 +103,27 @@ public final class SqlFormatter {
         formatted = MULTI_NEWLINE.matcher(formatted).replaceAll("\n");
         
         return formatted.trim();
+    }
+
+    private static boolean isKeyword(String word) {
+        switch (word) {
+            case "SELECT": case "FROM": case "WHERE": case "JOIN":
+            case "INNER": case "LEFT": case "RIGHT": case "OUTER":
+            case "ON": case "GROUP": case "BY": case "ORDER":
+            case "HAVING": case "INSERT": case "INTO": case "VALUES":
+            case "UPDATE": case "SET": case "DELETE": case "CREATE":
+            case "ALTER": case "DROP": case "INDEX": case "TABLE":
+            case "DATABASE": case "AND": case "OR": case "NOT":
+            case "IN": case "LIKE": case "BETWEEN": case "IS":
+            case "NULL": case "AS": case "ASC": case "DESC":
+            case "LIMIT": case "OFFSET": case "UNION": case "ALL":
+            case "COUNT": case "SUM": case "AVG": case "MAX":
+            case "MIN": case "DISTINCT": case "CASE": case "WHEN":
+            case "THEN": case "ELSE": case "END":
+                return true;
+            default:
+                return false;
+        }
     }
 
     public static String bindParameters(String sql, Map<Integer, Object> params) {
@@ -208,42 +248,39 @@ public final class SqlFormatter {
             return "";
         }
         
-        StringBuilder sb = new StringBuilder(sql.length());
+        int len = sql.length();
+        char[] result = new char[len];
+        int writePos = 0;
         boolean lastWasSpace = false;
         
-        for (int i = 0; i < sql.length(); i++) {
+        for (int i = 0; i < len; i++) {
             char c = sql.charAt(i);
             if (c == '\n' || c == '\r') {
                 if (!lastWasSpace) {
-                    sb.append(' ');
+                    result[writePos++] = ' ';
                     lastWasSpace = true;
                 }
             } else if (Character.isWhitespace(c)) {
                 if (!lastWasSpace) {
-                    sb.append(' ');
+                    result[writePos++] = ' ';
                     lastWasSpace = true;
                 }
             } else {
-                sb.append(c);
+                result[writePos++] = c;
                 lastWasSpace = false;
             }
         }
         
-        int len = sb.length();
         int start = 0;
-        int end = len;
+        int end = writePos;
         
-        while (start < len && Character.isWhitespace(sb.charAt(start))) {
+        while (start < end && result[start] == ' ') {
             start++;
         }
-        while (end > start && Character.isWhitespace(sb.charAt(end - 1))) {
+        while (end > start && result[end - 1] == ' ') {
             end--;
         }
         
-        if (start == 0 && end == len) {
-            return sb.toString();
-        }
-        
-        return sb.substring(start, end);
+        return new String(result, start, end - start);
     }
 }
