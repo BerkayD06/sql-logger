@@ -9,23 +9,24 @@
 	<artifactId>spring-boot-query-logger-starter</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
+	<name>Spring Boot Query Logger Starter</name>
 	
 	<description>A Spring Boot starter for logging and cancelling slow SQL queries. Automatically detects JPA and native SQL queries, formats them, and can cancel queries that exceed configured thresholds.</description>
-	<url>https://github.com/berkayd06/query-logger</url>
+	<url>https://github.com/BerkayD06/sql-logger</url>
 	
-	<licenses>
-		<license>
-			<name>MIT License</name>
-			<url>https://opensource.org/licenses/MIT</url>
-		</license>
-	</licenses>
 	
 	<developers>
 		<developer>
 			<name>Berkay Demirbas</name>
-			<email>berkayd06@gmail.com</email>
+			<email>berkay.demirbas@hotmail.com/email</email>
 		</developer>
 	</developers>
+
+	<scm>
+		<connection>scm:git:git://github.com/BerkayD06/sql-logger.git</connection>
+		<developerConnection>scm:git:ssh://github.com/BerkayD06/sql-logger.git</developerConnection>
+		<url>https://github.com/BerkayD06/sql-logger/tree/main</url>
+	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,9 +34,6 @@
 		<java.version>1.8</java.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<spring-boot.version>2.1.3.RELEASE</spring-boot.version>
-		<spring.version>5.1.5.RELEASE</spring.version>
-		<hibernate.version>5.4.27.Final</hibernate.version>
 		<gpg.skip>true</gpg.skip>
 	</properties>
 
@@ -43,25 +41,22 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-autoconfigure</artifactId>
-			<version>${spring-boot.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
-			<version>${spring-boot.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>${hibernate.version}</version>
+			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>${spring.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -80,6 +75,13 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>2.1.3.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -149,88 +151,34 @@
 					<skip>${gpg.skip}</skip>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<version>1.5.0</version>
+				<configuration>
+					<flattenMode>ossrh</flattenMode>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>flatten</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>flatten</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>flatten.clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>spring-boot-2.1</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<spring-boot.version>2.1.3.RELEASE</spring-boot.version>
-				<spring.version>5.1.5.RELEASE</spring.version>
-				<hibernate.version>5.4.27.Final</hibernate.version>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>spring-boot-2.7</id>
-			<properties>
-				<spring-boot.version>2.7.18</spring-boot.version>
-				<spring.version>5.3.31</spring.version>
-				<hibernate.version>5.6.15.Final</hibernate.version>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>spring-boot-3.0</id>
-			<properties>
-				<spring-boot.version>3.0.13</spring-boot.version>
-				<spring.version>6.0.15</spring.version>
-				<hibernate.version>6.1.7.Final</hibernate.version>
-				<maven.compiler.source>17</maven.compiler.source>
-				<maven.compiler.target>17</maven.compiler.target>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>spring-boot-3.1</id>
-			<properties>
-				<spring-boot.version>3.1.8</spring-boot.version>
-				<spring.version>6.0.17</spring.version>
-				<hibernate.version>6.2.18.Final</hibernate.version>
-				<maven.compiler.source>17</maven.compiler.source>
-				<maven.compiler.target>17</maven.compiler.target>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>spring-boot-3.2</id>
-			<properties>
-				<spring-boot.version>3.2.2</spring-boot.version>
-				<spring.version>6.1.3</spring.version>
-				<hibernate.version>6.4.1.Final</hibernate.version>
-				<maven.compiler.source>17</maven.compiler.source>
-				<maven.compiler.target>17</maven.compiler.target>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>java-11</id>
-			<properties>
-				<maven.compiler.source>11</maven.compiler.source>
-				<maven.compiler.target>11</maven.compiler.target>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>java-17</id>
-			<properties>
-				<maven.compiler.source>17</maven.compiler.source>
-				<maven.compiler.target>17</maven.compiler.target>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>java-21</id>
-			<properties>
-				<maven.compiler.source>21</maven.compiler.source>
-				<maven.compiler.target>21</maven.compiler.target>
-			</properties>
-		</profile>
-	</profiles>
 
 	<distributionManagement>
 		<snapshotRepository>
