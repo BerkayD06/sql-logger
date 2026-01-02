@@ -4,19 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class SqlFormatter {
     private SqlFormatter() {}
-
-    private static final Pattern SQL_KEYWORDS = Pattern.compile(
-        "\\b(SELECT|FROM|WHERE|JOIN|INNER|LEFT|RIGHT|OUTER|ON|GROUP|BY|ORDER|HAVING|" +
-        "INSERT|INTO|VALUES|UPDATE|SET|DELETE|CREATE|ALTER|DROP|INDEX|TABLE|DATABASE|" +
-        "AND|OR|NOT|IN|LIKE|BETWEEN|IS|NULL|AS|ASC|DESC|LIMIT|OFFSET|UNION|ALL|" +
-        "COUNT|SUM|AVG|MAX|MIN|DISTINCT|CASE|WHEN|THEN|ELSE|END)\\b",
-        Pattern.CASE_INSENSITIVE
-    );
     
     private static final Pattern MULTI_WHITESPACE = Pattern.compile("\\s+");
     private static final Pattern COMMA_WHITESPACE = Pattern.compile("\\s*,\\s*");
